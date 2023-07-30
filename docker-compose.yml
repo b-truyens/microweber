@@ -1,37 +1,70 @@
 version: '3'
 services:
-#  composer_installation:
-#    container_name: composer_installation
-#    image: composer
-#    volumes:
-#      - ./:/app
-#    command: composer install
-  php-apache:
-    image: thecodingmachine/php:8.1-v4-apache-node16
-    ports:
-      - 80:80
+
+  #PHP Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: weber-app
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
     volumes:
-     - ./:/var/www/html
-    links:
-      - 'mariadb'
-    environment:
-      APACHE_EXTENSION_DAV: 0
-      PHP_INI_MEMORY_LIMIT: 1g
-      PHP_INI_ERROR_REPORTING: E_ALL
-      PHP_EXTENSIONS: pgsql gettext imap sockets zip curl dom gd exif intl mbstring bcmath curl dom opcache mbstring soap xml xmlrpc fileinfo intl xml pdo_sqlite pdo_mysql pdo_pgsql
-      PECL_EXTENSION: sodium
-      STARTUP_COMMAND_1: composer install
-  mariadb:
-    image: mariadb:10.3
-    volumes:
-    - mariadb:/var/lib/mysql
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-      MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_USER: 'laravel'
-      MYSQL_PASSWORD: 'laravel'
-      MYSQL_DATABASE: 'laravel'
+      - ./:/var/www
+    networks:
+      - weber-network
+
+  #Nginx Service
+  webserver:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: weber-webserver
+    restart: unless-stopped
+    tty: true
     ports:
-      - 3306:3306
+      - "8010:80"
+    volumes:
+      - ./:/var/www
+    networks:
+      - weber-network
+
+  #MySQL Service
+  db:
+    image: mariadb
+    container_name: weber-db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: your_root_password
+    volumes:
+      - dbdata:/var/lib/mysql/
+    networks:
+      - weber-network
+
+  phpmyadmin:
+    container_name: weber-phpmyadmin
+    image: phpmyadmin
+    ports:
+      - 8081:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=weber-db
+    depends_on:
+      - db
+    networks:
+      - weber-network
+
+#Docker Networks
+networks:
+  weber-network:
+    driver: bridge
+
+#Volumes
 volumes:
-  mariadb:
+  dbdata:
+    driver: local
