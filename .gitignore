@@ -79,3 +79,5 @@ userfiles/modules/fullpage_cache/admin.php
 /config/app.php
 /config/database.php
 /config/microweber.php
+/.composer/
+.bash_history

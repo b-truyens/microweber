@@ -31,33 +31,33 @@ services:
       - weber-network
 
   #MySQL Service
-  db:
-    image: mariadb
-    container_name: weber-db
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "3310:3306"
-    environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: your_root_password
-    volumes:
-      - dbdata:/var/lib/mysql/
-    networks:
-      - weber-network
+  # db:
+  #   image: mariadb
+  #   container_name: weber-db
+  #   restart: unless-stopped
+  #   tty: true
+  #   ports:
+  #     - "3310:3306"
+  #   environment:
+  #     MYSQL_DATABASE: laravel
+  #     MYSQL_ROOT_PASSWORD: your_root_password
+  #   volumes:
+  #     - dbdata:/var/lib/mysql/
+  #   networks:
+  #     - weber-network
 
-  phpmyadmin:
-    container_name: weber-phpmyadmin
-    image: phpmyadmin
-    ports:
-      - 8081:80
-    environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOST=weber-db
-    depends_on:
-      - db
-    networks:
-      - weber-network
+  # phpmyadmin:
+  #   container_name: weber-phpmyadmin
+  #   image: phpmyadmin
+  #   ports:
+  #     - 8081:80
+  #   environment:
+  #     - PMA_ARBITRARY=1
+  #     - PMA_HOST=weber-db
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - weber-network
 
 #Docker Networks
 networks:
@@ -65,6 +65,6 @@ networks:
     driver: bridge
 
 #Volumes
-volumes:
-  dbdata:
-    driver: local
+# volumes:
+#   dbdata:
+#     driver: local
